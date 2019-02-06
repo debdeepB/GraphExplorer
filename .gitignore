@@ -1,0 +1,70 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Java template
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+#Image Files
+*.png
+
+# Ptyhon binaries
+*.pyc
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+!/.mvn/wrapper/maven-wrapper.jar
+
+/.idea/
+src/main/resources/pyt.py
+output/*
+output/
+data/*
+
+__pycache__
+__pycache__/*
+version2/python/__pycache__
+version2/python/__pycache__/*
+version2/python/venv
+version2/python/venv/*
+version2/python/.idea
+version2/python/.idea/*
+version2/java/target
+version2/java/target/*
+version2/java/.idea
+version2/java/.idea/*
+venv
+
+.vscode
+
+.idea
+
+# This file weights 1GB or more
+LogicalCoherence/java_logicalconsistency/data/*
