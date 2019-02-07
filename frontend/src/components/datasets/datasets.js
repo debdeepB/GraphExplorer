@@ -52,11 +52,18 @@ class Datasets extends Component {
       show: false
     });
     console.log(this.state.files);
+    var formData = new FormData();
+    formData.append("name", this.state.datasetName);
+    if (this.state.files.length > 0) {
+      formData.append("file", this.state.files[0]);
+    }
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data"
+      }
+    };
     axios
-      .post("http://127.0.0.1:8000/api/datasets/", {
-        name: this.state.datasetName,
-        files: this.state.files
-      })
+      .post("http://127.0.0.1:8000/api/datasets/", formData, config)
       .then(res => {
         var clonedArray = this.state.data.slice();
         clonedArray.push(res.data);
@@ -106,7 +113,7 @@ class Datasets extends Component {
 
         <form
           onSubmit={this.handleSubmit}
-          method="post"
+          method="POST"
           encType="multipart/form-data"
         >
           <Form.Label>Name your dataset</Form.Label>
