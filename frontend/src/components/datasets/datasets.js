@@ -7,6 +7,7 @@ import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "react-router-dom/Link";
 import axios from "axios";
+import Dropzone from "react-dropzone";
 
 class Datasets extends Component {
   constructor(props, context) {
@@ -20,6 +21,7 @@ class Datasets extends Component {
     this.state = {
       show: false,
       data: [],
+      files: [],
       datasetName: ""
     };
   }
@@ -32,19 +34,35 @@ class Datasets extends Component {
     this.setState({ show: true });
   }
 
-  handleSubmit() {
+  onDrop(files) {
+    console.log(files);
+    this.setState({ files });
+  }
+
+  onCancel() {
+    this.setState({
+      files: []
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    console.log("yo");
     this.setState({
       show: false
     });
+    console.log(this.state.files);
     axios
       .post("http://127.0.0.1:8000/api/datasets/", {
-        name: this.state.datasetName
+        name: this.state.datasetName,
+        files: this.state.files
       })
       .then(res => {
         var clonedArray = this.state.data.slice();
         clonedArray.push(res.data);
         this.setState({
-          data: clonedArray
+          data: clonedArray,
+          files: []
         });
       });
   }
@@ -75,36 +93,54 @@ class Datasets extends Component {
         </tr>
       );
     });
+    const files = this.state.files.map(file => (
+      <li key={file.name}>
+        {file.name} - {file.size} bytes
+      </li>
+    ));
     return (
       <div>
         <Button variant="primary" onClick={this.handleShow}>
           Add Dataset
         </Button>
-        <br />
-        <br />
-        <Modal show={this.state.show} onHide={this.handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Dataset</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <FormControl
-                type="text"
-                placeholder="Add your dataset"
-                value={this.state.datasetName}
-                onChange={this.handleChange}
-              />
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleClose}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={this.handleSubmit}>
-              Submit
-            </Button>
-          </Modal.Footer>
-        </Modal>
+
+        <form
+          onSubmit={this.handleSubmit}
+          method="post"
+          encType="multipart/form-data"
+        >
+          <Form.Label>Name your dataset</Form.Label>
+          <FormControl
+            type="text"
+            placeholder="Add your dataset"
+            value={this.state.datasetName}
+            onChange={this.handleChange}
+          />
+          <section>
+            <Dropzone
+              onDrop={this.onDrop.bind(this)}
+              onFileDialogCancel={this.onCancel.bind(this)}
+            >
+              {({ getRootProps, getInputProps }) => (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <p>Drop files here, or click to select files</p>
+                </div>
+              )}
+            </Dropzone>
+            <aside>
+              <h4>Files</h4>
+              <ul>{files}</ul>
+            </aside>
+          </section>
+          <Button variant="secondary" onClick={this.handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
+        </form>
+
         <Table striped bordered hover>
           <thead>
             <tr>
