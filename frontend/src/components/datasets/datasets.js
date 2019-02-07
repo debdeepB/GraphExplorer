@@ -4,6 +4,8 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "react-router-dom/Link";
 import axios from "axios";
 
 class Datasets extends Component {
@@ -65,7 +67,11 @@ class Datasets extends Component {
         <tr key={index}>
           <td>{entry.id}</td>
           <td>{entry.name}</td>
-          <td />
+          <td>
+            <Link to="/">
+              <FontAwesomeIcon icon="arrow-circle-right" />
+            </Link>
+          </td>
         </tr>
       );
     });
