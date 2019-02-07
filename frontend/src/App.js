@@ -1,26 +1,22 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import Datasets from "./components/datasets/datasets";
+import NavBar from "./components/navbar";
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Router>
+        <div className="container-fluid">
+          <NavBar />
+          <br />
+          <Switch>
+            <Route exact path="/" component={Datasets} />
+          </Switch>
+        </div>
+      </Router>
     );
   }
 }
