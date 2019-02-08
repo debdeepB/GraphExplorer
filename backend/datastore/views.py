@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
+from rest_framework.views import APIView
 from rest_framework import viewsets
 from .serializers import DatasetSerializer
 from .models import Dataset
 from rest_framework.response import Response
+from eda.statistics import EdaUtils
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -29,6 +31,21 @@ class DatasetView(viewsets.ViewSet):
       dataset.data_set.create(file=f)
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
+  
+# TODO make it async later and move this to another app
+class Eda(APIView):
+  def get(self, request, dataset_id):
+    dataset = get_object_or_404(Dataset, pk=dataset_id)
+    eda = EdaUtils(dataset.id)
+    k = 10
+    res = {
+      'graph_properties': eda.graph_properties(),
+      'top_k_event_slot_types': eda.top_k_event_slot_types(k),
+      'top_k_rel_slot_types': eda.top_k_rel_slot_types(k),
+      'top_k_relations': eda.top_k_relations(k)
+    }
+    return Response(res)
+
   
 
 

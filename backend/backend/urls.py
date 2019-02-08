@@ -23,5 +23,6 @@ router.register(r'datasets', views.DatasetView, 'dataset')
 
 urlpatterns = [
     url('admin/', admin.site.urls),
-    url('api/', include(router.urls))
+    url('api/', include(router.urls)),
+    url('api/eda/(?P<dataset_id>[0-9]+)/$', views.Eda.as_view())
 ]
