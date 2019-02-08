@@ -4,6 +4,15 @@ import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "react-router-dom/Link";
 import axios from "axios";
+import {
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  Bar
+} from "recharts";
 
 class Dataset extends Component {
   constructor(props) {
@@ -13,11 +22,27 @@ class Dataset extends Component {
     } = props;
     this.state = {
       datasetId: params.datasetId,
-      dataset: []
+      dataset: [],
+      graphStats: []
     };
   }
   componentDidMount() {
     this.fetchDataset();
+    this.fetchEda();
+  }
+
+  async fetchEda() {
+    try {
+      const { data } = await axios.get(
+        `http://127.0.0.1:8000/api/eda/${this.state.datasetId}`
+      );
+      this.setState({
+        graphStats: data
+      });
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   fetchDataset() {
@@ -32,10 +57,29 @@ class Dataset extends Component {
   }
 
   render() {
+    const data = [
+      {
+        name: "Unique count",
+        num_unique_entities: 10,
+        num_unique_relations: 20,
+        num_uniq_provenance: 15
+      }
+    ];
     return (
       <div className="card">
         <div className="card-header">{this.state.dataset.name}</div>
-        <div className="card-body" />
+        <div className="card-body">
+          <BarChart width={450} height={250} data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="num_unique_entities" fill="#8884d8" />
+            <Bar dataKey="num_unique_relations" fill="#8884d8" />
+            <Bar dataKey="num_uniq_provenance" fill="#8884d8" />
+          </BarChart>
+        </div>
       </div>
     );
   }
