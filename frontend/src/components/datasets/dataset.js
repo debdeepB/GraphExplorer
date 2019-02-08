@@ -39,7 +39,6 @@ class Dataset extends Component {
       this.setState({
         graphStats: data
       });
-      console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -57,28 +56,108 @@ class Dataset extends Component {
   }
 
   render() {
-    const data = [
-      {
-        name: "Unique count",
-        num_unique_entities: 10,
-        num_unique_relations: 20,
-        num_uniq_provenance: 15
-      }
+    console.log("graphstats");
+    console.log(this.state.graphStats);
+
+    const graphProperties = this.state.graphStats.graph_properties;
+    const topKEventSlotTypes = this.state.graphStats.top_k_event_slot_types;
+    const topKRelSlotTypes = this.state.graphStats.top_k_rel_slot_types;
+    const topKRelations = this.state.graphStats.top_k_relations;
+
+    const graphPropertiesData = [
+      { ...{ name: "unique properties" }, ...graphProperties }
     ];
+    const topKEventSlotTypesData = [
+      { ...{ name: "top k event slot types" }, ...topKEventSlotTypes }
+    ];
+    const topKRelSlotTypesData = [
+      { ...{ name: "top k relation slot types" }, ...topKRelSlotTypes }
+    ];
+    const topKRelationsData = [
+      { ...{ name: "top k relations" }, ...topKRelations }
+    ];
+
+    const graphPropertiesBars =
+      graphProperties &&
+      Object.keys(graphProperties).map((key, value) => {
+        var randomColor = "#000000".replace(/0/g, function() {
+          return (~~(Math.random() * 16)).toString(16);
+        });
+        return <Bar dataKey={key} fill={randomColor} />;
+      });
+    const topKEventSlotTypesBars =
+      topKEventSlotTypes &&
+      Object.keys(topKEventSlotTypes).map((key, value) => {
+        var randomColor = "#000000".replace(/0/g, function() {
+          return (~~(Math.random() * 16)).toString(16);
+        });
+        return <Bar dataKey={key} fill={randomColor} />;
+      });
+    const topKRelSlotTypesBars =
+      topKRelSlotTypes &&
+      Object.keys(topKRelSlotTypes).map((key, value) => {
+        var randomColor = "#000000".replace(/0/g, function() {
+          return (~~(Math.random() * 16)).toString(16);
+        });
+        return <Bar dataKey={key} fill={randomColor} />;
+      });
+
+    const topKRelationsBars =
+      topKRelations &&
+      Object.keys(topKRelations).map((key, value) => {
+        var randomColor = "#000000".replace(/0/g, function() {
+          return (~~(Math.random() * 16)).toString(16);
+        });
+        return <Bar dataKey={key} fill={randomColor} />;
+      });
+
     return (
       <div className="card">
         <div className="card-header">{this.state.dataset.name}</div>
         <div className="card-body">
-          <BarChart width={450} height={250} data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="num_unique_entities" fill="#8884d8" />
-            <Bar dataKey="num_unique_relations" fill="#8884d8" />
-            <Bar dataKey="num_uniq_provenance" fill="#8884d8" />
-          </BarChart>
+          <div className="row">
+            <div className="col">
+              <BarChart width={450} height={250} data={graphPropertiesData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {graphPropertiesBars}
+              </BarChart>
+            </div>
+            <div className="col">
+              <BarChart width={450} height={250} data={topKEventSlotTypesData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {topKEventSlotTypesBars}
+              </BarChart>
+            </div>
+            <div className="w-100" />
+            <div className="col">
+              <BarChart width={450} height={250} data={topKRelSlotTypesData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {topKRelSlotTypesBars}
+              </BarChart>
+            </div>
+            <div className="col">
+              <BarChart width={450} height={250} data={topKRelationsData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {topKRelationsBars}
+              </BarChart>
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -93,7 +93,7 @@ class Datasets extends Component {
           <td>{entry.id}</td>
           <td>{entry.name}</td>
           <td>
-            <Link to="/">
+            <Link to={"/datasets/" + entry.id}>
               <FontAwesomeIcon icon="arrow-circle-right" />
             </Link>
           </td>
