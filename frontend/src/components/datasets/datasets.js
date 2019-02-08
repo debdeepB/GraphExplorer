@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -55,7 +54,9 @@ class Datasets extends Component {
     var formData = new FormData();
     formData.append("name", this.state.datasetName);
     if (this.state.files.length > 0) {
-      formData.append("file", this.state.files[0]);
+      for (var i = 0; i < this.state.files.length; i++) {
+        formData.append("file", this.state.files[i]);
+      }
     }
     const config = {
       headers: {
@@ -100,54 +101,9 @@ class Datasets extends Component {
         </tr>
       );
     });
-    const files = this.state.files.map(file => (
-      <li key={file.name}>
-        {file.name} - {file.size} bytes
-      </li>
-    ));
-    return (
-      <div>
-        <Button variant="primary" onClick={this.handleShow}>
-          Add Dataset
-        </Button>
-
-        <form
-          onSubmit={this.handleSubmit}
-          method="POST"
-          encType="multipart/form-data"
-        >
-          <Form.Label>Name your dataset</Form.Label>
-          <FormControl
-            type="text"
-            placeholder="Add your dataset"
-            value={this.state.datasetName}
-            onChange={this.handleChange}
-          />
-          <section>
-            <Dropzone
-              onDrop={this.onDrop.bind(this)}
-              onFileDialogCancel={this.onCancel.bind(this)}
-            >
-              {({ getRootProps, getInputProps }) => (
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <p>Drop files here, or click to select files</p>
-                </div>
-              )}
-            </Dropzone>
-            <aside>
-              <h4>Files</h4>
-              <ul>{files}</ul>
-            </aside>
-          </section>
-          <Button variant="secondary" onClick={this.handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </form>
-
+    let table;
+    if (result.length > 0) {
+      table = (
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -158,6 +114,66 @@ class Datasets extends Component {
           </thead>
           <tbody>{result}</tbody>
         </Table>
+      );
+    }
+    const files = this.state.files.map(file => (
+      <li key={file.name}>
+        {file.name} - {file.size} bytes
+      </li>
+    ));
+    let form;
+    if (this.state.show) {
+      form = (
+        <form
+          onSubmit={this.handleSubmit}
+          method="POST"
+          encType="multipart/form-data"
+        >
+          <div className="card mt-3 mb-3">
+            <div className="card-header">Add Dataset</div>
+            <div className="card-body">
+              <FormControl
+                type="text"
+                placeholder="Add your dataset"
+                value={this.state.datasetName}
+                onChange={this.handleChange}
+              />
+              <section>
+                <Dropzone
+                  onDrop={this.onDrop.bind(this)}
+                  onFileDialogCancel={this.onCancel.bind(this)}
+                >
+                  {({ getRootProps, getInputProps }) => (
+                    <div {...getRootProps()}>
+                      <input {...getInputProps()} />
+                      <p>Drop files here, or click to select files</p>
+                    </div>
+                  )}
+                </Dropzone>
+                <aside>
+                  <ul>{files}</ul>
+                </aside>
+              </section>
+            </div>
+            <div className="card-footer">
+              <Button variant="secondary" onClick={this.handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" type="submit">
+                Submit
+              </Button>
+            </div>
+          </div>
+        </form>
+      );
+    }
+    return (
+      <div>
+        <Button variant="primary" onClick={this.handleShow}>
+          Add Dataset
+        </Button>
+        {form}
+        {table}
       </div>
     );
   }

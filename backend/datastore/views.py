@@ -22,11 +22,11 @@ class DatasetView(viewsets.ViewSet):
     return Response(serializer.data)
 
   def create(self, request):
-    print request.FILES
     dataset = Dataset.objects.create(name=request.data.get("name"))
     dataset.save()
     # save files
-    print request.data
+    for f in request.FILES.getlist('file'):
+      dataset.data_set.create(file=f)
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
   
