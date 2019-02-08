@@ -8,6 +8,7 @@ library.add(faArrowCircleRight);
 
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import Datasets from "./components/datasets/datasets";
+import Dataset from "./components/datasets/dataset";
 import NavBar from "./components/navbar";
 
 class App extends Component {
@@ -18,7 +19,8 @@ class App extends Component {
           <NavBar />
           <br />
           <Switch>
-            <Route exact path="/" component={Datasets} />
+            <Route exact path="/datasets" component={Datasets} />
+            <Route exact path="/datasets/:datasetId" component={Dataset} />
           </Switch>
         </div>
       </Router>

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "react-router-dom/Link";
@@ -134,7 +133,7 @@ class Datasets extends Component {
             <div className="card-body">
               <FormControl
                 type="text"
-                placeholder="Add your dataset"
+                placeholder="Enter topic name"
                 value={this.state.datasetName}
                 onChange={this.handleChange}
               />
