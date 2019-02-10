@@ -2,9 +2,10 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faArrowCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleRight, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faArrowCircleRight);
+library.add(faTrash);
 
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import Datasets from "./components/datasets/datasets";

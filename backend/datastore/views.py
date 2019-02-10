@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from .serializers import DatasetSerializer
 from .models import Dataset
 from rest_framework.response import Response
-from eda.statistics import EdaUtils
+from eda.eda_utils import EdaUtils
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -31,6 +31,13 @@ class DatasetView(viewsets.ViewSet):
       dataset.data_set.create(file=f)
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
+
+  def destroy(self, request, pk=None):
+    dataset = Dataset.objects.get(pk=pk)
+    serializer = DatasetSerializer(dataset)
+    serializer_data = serializer.data
+    dataset.delete()
+    return Response(serializer_data)
   
 # TODO make it async later and move this to another app
 class Eda(APIView):

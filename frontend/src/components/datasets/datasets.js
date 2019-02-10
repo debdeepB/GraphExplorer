@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
+import { ButtonGroup } from "react-bootstrap";
 import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "react-router-dom/Link";
@@ -15,6 +16,7 @@ class Datasets extends Component {
     this.handleClose = this.handleClose.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
 
     this.state = {
       show: false,
@@ -45,11 +47,6 @@ class Datasets extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log("yo");
-    this.setState({
-      show: false
-    });
-    console.log(this.state.files);
     var formData = new FormData();
     formData.append("name", this.state.datasetName);
     if (this.state.files.length > 0) {
@@ -69,13 +66,30 @@ class Datasets extends Component {
         clonedArray.push(res.data);
         this.setState({
           data: clonedArray,
-          files: []
+          files: [],
+          datasetName: "",
+          show: false
         });
       });
   }
 
   handleChange(event) {
     this.setState({ datasetName: event.target.value });
+  }
+
+  async handleDelete(datasetId) {
+    try {
+      const { data } = await axios.delete(
+        `http://127.0.0.1:8000/api/datasets/${datasetId}`
+      );
+      var clonedArray = this.state.data.slice();
+      clonedArray = clonedArray.filter(dataset => dataset.id !== data.id);
+      this.setState({
+        data: clonedArray
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   componentDidMount() {
@@ -90,12 +104,21 @@ class Datasets extends Component {
     const result = data.map((entry, index) => {
       return (
         <tr key={index}>
-          <td>{entry.id}</td>
+          <td>{index}</td>
           <td>{entry.name}</td>
-          <td>
-            <Link to={"/datasets/" + entry.id}>
-              <FontAwesomeIcon icon="arrow-circle-right" />
-            </Link>
+          <td>{entry.created_at}</td>
+          <td className="text-center">
+            <ButtonGroup>
+              <Button variant="link" href={"/datasets/" + entry.id}>
+                <FontAwesomeIcon icon="arrow-circle-right" />
+              </Button>
+              <Button
+                variant="link"
+                onClick={() => this.handleDelete(entry.id)}
+              >
+                <FontAwesomeIcon icon="trash" />
+              </Button>
+            </ButtonGroup>
           </td>
         </tr>
       );
@@ -108,6 +131,7 @@ class Datasets extends Component {
             <tr>
               <th>#</th>
               <th>Name</th>
+              <th>Created At</th>
               <th />
             </tr>
           </thead>
