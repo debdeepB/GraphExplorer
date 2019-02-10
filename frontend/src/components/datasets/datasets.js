@@ -4,9 +4,9 @@ import Button from "react-bootstrap/Button";
 import { ButtonGroup } from "react-bootstrap";
 import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "react-router-dom/Link";
 import axios from "axios";
 import Dropzone from "react-dropzone";
+import Moment from "react-moment";
 
 class Datasets extends Component {
   constructor(props, context) {
@@ -106,7 +106,9 @@ class Datasets extends Component {
         <tr key={index}>
           <td>{index}</td>
           <td>{entry.name}</td>
-          <td>{entry.created_at}</td>
+          <td>
+            <Moment fromNow>{entry.created_at}</Moment>
+          </td>
           <td className="text-center">
             <ButtonGroup>
               <Button variant="link" href={"/datasets/" + entry.id}>
