@@ -40,18 +40,18 @@ class DatasetView(viewsets.ViewSet):
     return Response(serializer_data)
   
 # TODO make it async later and move this to another app
-class Eda(APIView):
-  def get(self, request, dataset_id):
-    dataset = get_object_or_404(Dataset, pk=dataset_id)
-    eda = EdaUtils(dataset.id)
-    k = 10
-    res = {
-      'graph_properties': eda.graph_properties(),
-      'top_k_event_slot_types': eda.top_k_event_slot_types(k),
-      'top_k_rel_slot_types': eda.top_k_rel_slot_types(k),
-      'top_k_relations': eda.top_k_relations(k)
-    }
-    return Response(res)
+# class Eda(APIView):
+#   def get(self, request, dataset_id):
+#     dataset = get_object_or_404(Dataset, pk=dataset_id)
+#     eda = EdaUtils(dataset.id)
+#     k = 10
+#     res = {
+#       'graph_properties': eda.graph_properties(),
+#       'top_k_event_slot_types': eda.top_k_event_slot_types(k),
+#       'top_k_rel_slot_types': eda.top_k_rel_slot_types(k),
+#       'top_k_relations': eda.top_k_relations(k)
+#     }
+#     return Response(res)
 
   
 

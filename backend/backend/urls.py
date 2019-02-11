@@ -16,13 +16,14 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from datastore import views
+from datastore.views import DatasetView
+from eda.views import EdaView
 
 router = routers.DefaultRouter()
-router.register(r'datasets', views.DatasetView, 'dataset')
+router.register(r'datasets', DatasetView, 'dataset')
 
 urlpatterns = [
     url('admin/', admin.site.urls),
     url('api/', include(router.urls)),
-    url('api/eda/(?P<dataset_id>[0-9]+)/$', views.Eda.as_view())
+    url('api/eda/(?P<dataset_id>[0-9]+)/$', EdaView.as_view())
 ]
