@@ -59,7 +59,7 @@ class Dataset extends Component {
                 width={450}
                 height={250}
                 data={graphProperties}
-                name="top k relations"
+                name="unique properties"
               />
             </div>
             <div className="col">
@@ -67,7 +67,7 @@ class Dataset extends Component {
                 width={450}
                 height={250}
                 data={topKEventSlotTypes}
-                name="top k relations"
+                name="top k event roles"
               />
             </div>
             <div className="w-100" />
@@ -76,7 +76,7 @@ class Dataset extends Component {
                 width={450}
                 height={250}
                 data={topKRelSlotTypes}
-                name="top k relations"
+                name="top k relation roles"
               />
             </div>
             <div className="col">
