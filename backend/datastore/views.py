@@ -28,16 +28,12 @@ class DatasetView(viewsets.ViewSet):
     dataset.save()
     # save files
     for f in request.FILES.getlist('file'):
-      ds = Data.objects.create(file=f, dataset_id=dataset.id)
+      ds = dataset.data_set.create(file=f)
       eda = EdaUtils(dataset.id)
       eda.import_data()
       ds.graph = eda.convert_to_networkx_json()
       ds.save()
     
-    # eda = EdaUtils(dataset.id)
-    # eda.import_data()
-    # ds.graph = eda.convert_to_networkx_json()
-    # ds.save()
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
 

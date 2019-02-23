@@ -11,11 +11,9 @@ class EdaUtils:
     self.dataset = Dataset.objects.get(pk=dataset_id)
 
   def import_data(self):
-    print "yo"
     print self.dataset.data_set
     aida_edges_file = BASE_DIR + self.dataset.data_set.first().file.url
     self.aida_edges = pd.read_csv(aida_edges_file, sep="\t", quoting=csv.QUOTE_NONE)
-    print self.aida_edges
   
   def graph_properties(self):
     return {
