@@ -5,9 +5,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from .serializers import DatasetSerializer
-from .models import Dataset
+from .models import Dataset, Data
 from rest_framework.response import Response
-from eda.eda_utils import EdaUtils
+from eda.eda_utils.eda_utils import EdaUtils
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -28,7 +28,16 @@ class DatasetView(viewsets.ViewSet):
     dataset.save()
     # save files
     for f in request.FILES.getlist('file'):
-      dataset.data_set.create(file=f)
+      ds = Data.objects.create(file=f, dataset_id=dataset.id)
+      eda = EdaUtils(dataset.id)
+      eda.import_data()
+      ds.graph = eda.convert_to_networkx_json()
+      ds.save()
+    
+    # eda = EdaUtils(dataset.id)
+    # eda.import_data()
+    # ds.graph = eda.convert_to_networkx_json()
+    # ds.save()
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
 
@@ -38,21 +47,6 @@ class DatasetView(viewsets.ViewSet):
     serializer_data = serializer.data
     dataset.delete()
     return Response(serializer_data)
-  
-# TODO make it async later and move this to another app
-# class Eda(APIView):
-#   def get(self, request, dataset_id):
-#     dataset = get_object_or_404(Dataset, pk=dataset_id)
-#     eda = EdaUtils(dataset.id)
-#     k = 10
-#     res = {
-#       'graph_properties': eda.graph_properties(),
-#       'top_k_event_slot_types': eda.top_k_event_slot_types(k),
-#       'top_k_rel_slot_types': eda.top_k_rel_slot_types(k),
-#       'top_k_relations': eda.top_k_relations(k)
-#     }
-#     return Response(res)
-
   
 
 

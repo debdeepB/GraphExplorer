@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 # Create your models here.
@@ -12,5 +12,8 @@ class Data(models.Model):
   file = models.FileField()
   created_at = models.DateTimeField(auto_now=True)
   dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+  graph = JSONField(null=True, blank=True)
+
+
 
 

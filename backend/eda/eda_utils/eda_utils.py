@@ -2,15 +2,20 @@ from backend.settings import BASE_DIR
 from datastore.models import Dataset
 import pandas as pd
 import csv
+import networkx as nx
+import json
+from networkx.readwrite import json_graph
 
 class EdaUtils:
   def __init__(self, dataset_id):
     self.dataset = Dataset.objects.get(pk=dataset_id)
-    self.import_data()
 
   def import_data(self):
+    print "yo"
+    print self.dataset.data_set
     aida_edges_file = BASE_DIR + self.dataset.data_set.first().file.url
     self.aida_edges = pd.read_csv(aida_edges_file, sep="\t", quoting=csv.QUOTE_NONE)
+    print self.aida_edges
   
   def graph_properties(self):
     return {
@@ -29,6 +34,31 @@ class EdaUtils:
   def top_k_relations(self, k):
     k = 3
     return self.aida_edges[['event_relation_id']].groupby('event_relation_id').size().nlargest(k).to_dict()
+
+  def convert_to_networkx_json(self):
+    G = nx.MultiGraph()
+    node_map = {}
+
+    for index, row in self.aida_edges.iterrows():
+      node_id_1 = row['event_relation_id']
+      node_id_2 = row['entity_id']
+      if node_id_1 not in node_map:
+          node_map[node_id_1] = len(node_map)
+      if node_id_2 not in node_map:
+          node_map[node_id_2] = len(node_map)
+      if not G.has_node(node_map[node_id_1]):
+          # event info
+          G.add_node(node_map[node_id_1], node_id=node_id_1, node_text=row['event_relation_type'] + row['event_relation_subtype'], node_type="event")
+          # entity info
+      if not G.has_node(node_map[node_id_2]):
+          G.add_node(node_map[node_id_2], node_id=node_id_2, node_text=row['entity_string'], node_type="entity")
+
+      G.add_edge(node_map[node_id_1], node_map[node_id_2],
+                edge_relation=row['event_relation_arg_role'])
+        
+    json_data = json_graph.node_link_data(G)
+    return json.dumps(json_data)
+  
     
 
 

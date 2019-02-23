@@ -13,6 +13,7 @@ class EdaView(APIView):
   def get(self, request, dataset_id):
     dataset = get_object_or_404(Dataset, pk=dataset_id)
     eda = EdaUtils(dataset.id)
+    eda.import_data()
     k = 10
     res = {
       'graph_properties': eda.graph_properties(),
