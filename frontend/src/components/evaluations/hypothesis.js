@@ -22,7 +22,8 @@ class Hypothesis extends Component {
       edges: [],
       dataset: [],
       network: {},
-      search: ""
+      search: "",
+      clicked: []
     };
   }
 
@@ -39,10 +40,24 @@ class Hypothesis extends Component {
         `http://127.0.0.1:8000/api/search/179/?search=${this.state.search}`
       );
       var newNodes = this.state.nodes.slice();
+      var incomingNodes = [];
       for (let i = 0; i < data.length; i++) {
-        newNodes.push(data[i]);
+        var newNode = {};
+        var node = data[i];
+        if (this.state.nodes.findIndex(x => x.id === node.id) === -1) {
+          newNode["id"] = node["id"];
+          newNode["label"] = node["label"];
+          newNode["title"] = node["title"];
+          newNode["color"] =
+            node["type"] === "event"
+              ? { background: "#ffb3ff", border: "#d62ad6" }
+              : { background: "#bcffff", border: "#2fcfce" };
+          newNode["shape"] = node["type"] === "event" ? "triangle" : "dot";
+          newNodes.push(newNode);
+          incomingNodes.push(newNode);
+        }
       }
-      this.state.network.body.data.nodes.add(data);
+      this.state.network.body.data.nodes.add(incomingNodes);
       this.setState({
         nodes: newNodes
       });
@@ -50,7 +65,6 @@ class Hypothesis extends Component {
     } catch (error) {
       console.log(error);
     }
-    console.log(this.state.search);
   }
 
   async componentDidMount() {
@@ -60,7 +74,6 @@ class Hypothesis extends Component {
 
   async addNetworkListener() {
     var that = this;
-    console.log(this.state.network);
     this.state.network.on("click", function(properties) {
       var ids = properties.nodes;
       ids && that.fetchNeighbors(ids[0]);
@@ -68,17 +81,39 @@ class Hypothesis extends Component {
   }
 
   async fetchNeighbors(id) {
+    if (this.state.clicked.findIndex(x => x === id) !== -1) {
+      return;
+    }
     try {
+      var newClicked = this.state.clicked.slice();
+      newClicked.push(id);
+      this.setState({
+        clicked: newClicked
+      });
+
       const { data } = await axios.get(
         `http://127.0.0.1:8000/api/getneighbors/${id}/`
       );
+
       var incomingNodes = [];
       var newNodes = this.state.nodes.slice();
       var newEdges = this.state.edges.slice();
       var incomingEdges = [];
       for (let i = 0; i < data.nodes.length; i++) {
-        incomingNodes.push(data.nodes[i]);
-        newNodes.push(data.nodes[i]);
+        var newNode = {};
+        var node = data.nodes[i];
+        if (this.state.nodes.findIndex(x => x.id === node.id) === -1) {
+          newNode["id"] = node["id"];
+          newNode["label"] = node["label"];
+          newNode["title"] = node["title"];
+          newNode["color"] =
+            node["type"] === "event"
+              ? { background: "#ffb3ff", border: "#d62ad6" }
+              : { background: "#bcffff", border: "#2fcfce" };
+          newNode["shape"] = node["type"] === "event" ? "triangle" : "dot";
+          incomingNodes.push(newNode);
+          newNodes.push(newNode);
+        }
       }
       for (let i = 0; i < data.edges.length; i++) {
         var edge = data.edges[i];
@@ -89,6 +124,7 @@ class Hypothesis extends Component {
         newEdges.push(newEdge);
         incomingEdges.push(newEdge);
       }
+
       this.state.network.body.data.nodes.add(incomingNodes);
       this.state.network.body.data.edges.add(incomingEdges);
       this.setState({
