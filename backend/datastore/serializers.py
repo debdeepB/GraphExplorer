@@ -7,9 +7,10 @@ class DatasetSerializer(serializers.ModelSerializer):
     fields = ('id','name', 'created_at')
 
 class NodeSerializer(serializers.ModelSerializer):
+  title = serializers.CharField(source='nid')
   class Meta:
     model = Node
-    fields = ('id','nid', 'label', 'type')
+    fields = ('id','title', 'label', 'type')
 
 class EdgeSerializer(serializers.ModelSerializer):
   class Meta:

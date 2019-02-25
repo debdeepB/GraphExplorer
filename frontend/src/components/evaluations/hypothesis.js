@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { DataSet, Network } from "vis/index-network";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
+import axios from "axios";
 
 import "vis/dist/vis-network.min.css";
-import axios from "axios";
 
 class Hypothesis extends Component {
   constructor(props) {
@@ -32,8 +32,30 @@ class Hypothesis extends Component {
     });
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
     event.preventDefault();
+    try {
+      const { data } = await axios.get(
+        `http://127.0.0.1:8000/api/search/179/?search=${this.state.search}`
+      );
+      var newNodes = this.state.nodes.slice();
+      for (let i = 0; i < data.length; i++) {
+        newNodes.push(data[i]);
+      }
+      this.setState({
+        nodes: newNodes,
+        network: new Network(
+          this.refs.graphRef,
+          {
+            nodes: newNodes,
+            edges: this.state.edges
+          },
+          {}
+        )
+      });
+    } catch (error) {
+      console.log(error);
+    }
     console.log(this.state.search);
   }
 
