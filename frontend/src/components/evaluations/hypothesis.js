@@ -42,17 +42,11 @@ class Hypothesis extends Component {
       for (let i = 0; i < data.length; i++) {
         newNodes.push(data[i]);
       }
+      this.state.network.body.data.nodes.add(data);
       this.setState({
-        nodes: newNodes,
-        network: new Network(
-          this.refs.graphRef,
-          {
-            nodes: newNodes,
-            edges: this.state.edges
-          },
-          {}
-        )
+        nodes: newNodes
       });
+      await this.addNetworkListener();
     } catch (error) {
       console.log(error);
     }
@@ -62,6 +56,49 @@ class Hypothesis extends Component {
   async componentDidMount() {
     await this.fetchDataset();
     await this.populateNetwork();
+  }
+
+  async addNetworkListener() {
+    var that = this;
+    console.log(this.state.network);
+    this.state.network.on("click", function(properties) {
+      var ids = properties.nodes;
+      ids && that.fetchNeighbors(ids[0]);
+    });
+  }
+
+  async fetchNeighbors(id) {
+    try {
+      const { data } = await axios.get(
+        `http://127.0.0.1:8000/api/getneighbors/${id}/`
+      );
+      var incomingNodes = [];
+      var newNodes = this.state.nodes.slice();
+      var newEdges = this.state.edges.slice();
+      var incomingEdges = [];
+      for (let i = 0; i < data.nodes.length; i++) {
+        incomingNodes.push(data.nodes[i]);
+        newNodes.push(data.nodes[i]);
+      }
+      for (let i = 0; i < data.edges.length; i++) {
+        var edge = data.edges[i];
+        var newEdge = {};
+        newEdge["from"] = edge["from_node_id"];
+        newEdge["to"] = edge["to_node_id"];
+        newEdge["title"] = edge["title"];
+        newEdges.push(newEdge);
+        incomingEdges.push(newEdge);
+      }
+      this.state.network.body.data.nodes.add(incomingNodes);
+      this.state.network.body.data.edges.add(incomingEdges);
+      this.setState({
+        nodes: newNodes,
+        edges: newEdges
+      });
+      await this.addNetworkListener();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async populateNetwork() {
