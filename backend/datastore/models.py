@@ -14,6 +14,17 @@ class Data(models.Model):
   dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
   graph = JSONField(null=True, blank=True)
 
+class Node(models.Model):
+  nid = models.CharField(max_length=200)
+  label = models.CharField(max_length=200)
+  type = models.CharField(max_length=200)
+  data = models.ForeignKey(Data, on_delete=models.CASCADE)
+
+class Edge(models.Model):
+  from_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='source')
+  to_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='dest')
+  title = models.CharField(max_length=200)
+
 
 
 

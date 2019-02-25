@@ -5,9 +5,10 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from .serializers import DatasetSerializer
-from .models import Dataset, Data
+from .models import Dataset, Data, Node, Edge
 from rest_framework.response import Response
 from eda.eda_utils.eda_utils import EdaUtils
+import json
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -31,7 +32,26 @@ class DatasetView(viewsets.ViewSet):
       ds = dataset.data_set.create(file=f)
       eda = EdaUtils(dataset.id)
       eda.import_data()
-      ds.graph = eda.convert_to_networkx_json()
+      json_data, node_id_map= eda.convert_to_networkx_json()
+      for edge in json_data["links"]:
+        source_id = edge["source"]
+        target_id = edge["target"]
+        edge_relation = edge["edge_relation"]
+
+        source_node = node_id_map[source_id]
+        target_node = node_id_map[target_id]
+
+        source, created = Node.objects.get_or_create(data_id=ds.id, nid=source_node["node_id"], defaults={
+          'label': source_node["node_text"],
+          'type': source_node["node_type"]
+        })
+        target, created = Node.objects.get_or_create(data_id=ds.id, nid=target_node["node_id"], defaults={
+          'label': source_node["node_text"],
+          'type': source_node["node_type"]
+        })
+        Edge.objects.create(from_node=source, to_node=target, title=edge_relation)
+      
+      ds.graph = json.dumps(json_data)
       ds.save()
     
     serializer = DatasetSerializer(dataset)

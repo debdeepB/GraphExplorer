@@ -114,6 +114,9 @@ class Datasets extends Component {
               <Button variant="link" href={"/datasets/" + entry.id}>
                 <FontAwesomeIcon icon="arrow-circle-right" />
               </Button>
+              <Button variant="link" href={"/hypothesis/" + entry.id}>
+                <FontAwesomeIcon icon="arrow-circle-right" />
+              </Button>
               <Button
                 variant="link"
                 onClick={() => this.handleDelete(entry.id)}
