@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { DataSet, Network } from "vis/index-network";
+import FormControl from "react-bootstrap/FormControl";
+import Button from "react-bootstrap/Button";
 
 import "vis/dist/vis-network.min.css";
 import axios from "axios";
@@ -11,13 +13,28 @@ class Hypothesis extends Component {
       match: { params }
     } = props;
 
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state = {
       datasetId: params.datasetId,
       nodes: [],
       edges: [],
       dataset: [],
-      network: {}
+      network: {},
+      search: ""
     };
+  }
+
+  handleChange(event) {
+    this.setState({
+      search: event.target.value
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    console.log(this.state.search);
   }
 
   async componentDidMount() {
@@ -52,7 +69,19 @@ class Hypothesis extends Component {
   render() {
     return (
       <div className="card">
-        <div className="card-header">Visualization</div>
+        <div className="card-header">
+          <form onSubmit={this.handleSubmit} className="input-group">
+            <FormControl
+              type="text"
+              placeholder="Enter topic name"
+              value={this.state.search}
+              onChange={this.handleChange}
+            />
+            <Button variant="primary" type="submit" className="input-group-btn">
+              Submit
+            </Button>
+          </form>
+        </div>
         <div className="card-body">
           <div ref="graphRef" style={{ height: "1079px", width: "1039px" }} />
         </div>

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import viewsets
-from .serializers import DatasetSerializer
+from .serializers import DatasetSerializer, NodeSerializer, EdgeSerializer
 from .models import Dataset, Data, Node, Edge
 from rest_framework.response import Response
 from eda.eda_utils.eda_utils import EdaUtils
@@ -64,6 +64,30 @@ class DatasetView(viewsets.ViewSet):
     dataset.delete()
     return Response(serializer_data)
   
+class SearchNodeView(APIView):
+  def get(self, request, data_id):
+    label = request.GET.get('search', '')
+    nodes = Node.objects.filter(data_id=data_id, label=label)
+    serializer = NodeSerializer(nodes, many=True)
+    return Response(serializer.data)
 
-
+class NodeView(APIView):
+  def get(self, request, node_id):
+    node = Node.objects.get(pk=node_id)
+    serializer = NodeSerializer(node)
+    return Response(serializer.data)
+  
+class NeighborView(APIView):
+  def get(self, request, node_id):
+    node = Node.objects.get(pk=node_id)
+    edges = Edge.objects.filter(from_node_id=node.id)
+    neighbor_ids = edges.all().values_list('to_node_id', flat=True)
+    neighbors = Node.objects.filter(pk__in=neighbor_ids)
+    node_serialier = NodeSerializer(neighbors, many=True)
+    edge_serializer = EdgeSerializer(edges, many=True)
+    data = {
+      "nodes": node_serialier.data,
+      "edges": edge_serializer.data
+    }
+    return Response(data)
 
