@@ -926,7 +926,8 @@ class Hypothesis extends Component {
             }
           ]
         }
-      ]
+      ],
+      hypothesisIdMap: {}
     };
   }
 
@@ -936,12 +937,53 @@ class Hypothesis extends Component {
     });
   }
 
-  handleAddHypothesis(index) {
+  async handleAddHypothesis(index) {
     var hypo = this.state.hypothesis[index];
     // add nodes and add edges
     var newNodes = this.state.nodes.slice();
     var incomingNodes = [];
-    // for (i = 0; i < hypo.)
+    for (let i = 0; i < hypo.nodes.length; i++) {
+      var newNode = {};
+      var node = hypo.nodes[i];
+      if (
+        this.state.nodes.findIndex(x => x.title === node.node_cluster_id) === -1
+      ) {
+        newNode["id"] = node["node_cluster_id"];
+        newNode["label"] = node["node_text"];
+        newNode["title"] = node["node_cluster_id"];
+        newNode["color"] =
+          node["is_mention_id"] === true
+            ? { background: "#ffb3ff", border: "#d62ad6" }
+            : { background: "#bcffff", border: "#2fcfce" };
+        newNode["shape"] = node["is_mention_id"] === true ? "triangle" : "dot";
+        incomingNodes.push(newNode);
+        newNodes.push(newNode);
+      }
+    }
+    var newEdges = this.state.edges.slice();
+    var incomingEdges = [];
+    console.log(hypo.nodes);
+    console.log(hypo.links);
+    for (let i = 0; i < hypo.links.length; i++) {
+      var edge = hypo.links[i];
+      var newEdge = {};
+      newEdge["from"] = hypo.nodes.find(
+        x => x.id === edge["source"]
+      ).node_cluster_id;
+      newEdge["to"] = hypo.nodes.find(
+        x => x.id === edge["target"]
+      ).node_cluster_id;
+      newEdge["title"] = edge["edge_relation"];
+      newEdges.push(newEdge);
+      incomingEdges.push(newEdge);
+    }
+    this.state.network.body.data.nodes.add(incomingNodes);
+    this.state.network.body.data.edges.add(incomingEdges);
+    this.setState({
+      nodes: newNodes,
+      edges: newEdges
+    });
+    await this.addNetworkListener();
 
     console.log(hypo);
   }
@@ -957,7 +999,7 @@ class Hypothesis extends Component {
       for (let i = 0; i < data.length; i++) {
         var newNode = {};
         var node = data[i];
-        if (this.state.nodes.findIndex(x => x.id === node.id) === -1) {
+        if (this.state.nodes.findIndex(x => x.title === node.title) === -1) {
           newNode["id"] = node["id"];
           newNode["label"] = node["label"];
           newNode["title"] = node["title"];
@@ -1032,8 +1074,17 @@ class Hypothesis extends Component {
       for (let i = 0; i < data.edges.length; i++) {
         var edge = data.edges[i];
         var newEdge = {};
-        newEdge["from"] = edge["from_node_id"];
-        newEdge["to"] = edge["to_node_id"];
+        var source =
+          newNodes.findIndex(x => x.id === edge["from_node_id"]) === -1
+            ? edge["nid1"]
+            : edge["from_node_id"];
+        var target =
+          newNodes.findIndex(x => x.id === edge["to_node_id"]) === -1
+            ? edge["nid2"]
+            : edge["to_node_id"];
+
+        newEdge["from"] = source;
+        newEdge["to"] = target;
         newEdge["title"] = edge["title"];
         newEdges.push(newEdge);
         incomingEdges.push(newEdge);

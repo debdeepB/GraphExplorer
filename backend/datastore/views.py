@@ -2,13 +2,16 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render, get_object_or_404
+from django.contrib.postgres.search import TrigramSimilarity
 from rest_framework.views import APIView
 from rest_framework import viewsets
+from rest_framework.response import Response
+import json
+
+
 from .serializers import DatasetSerializer, NodeSerializer, EdgeSerializer
 from .models import Dataset, Data, Node, Edge
-from rest_framework.response import Response
 from eda.eda_utils.eda_utils import EdaUtils
-import json
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -66,8 +69,8 @@ class DatasetView(viewsets.ViewSet):
   
 class SearchNodeView(APIView):
   def get(self, request, data_id):
-    label = request.GET.get('search', '')
-    nodes = Node.objects.filter(data_id=data_id, label=label)
+    full_text = request.GET.get('search', '')
+    nodes = Node.objects.filter(data_id=data_id).annotate(similarity=TrigramSimilarity('label', full_text)).filter(similarity__gt=0.3).order_by('-similarity')
     serializer = NodeSerializer(nodes, many=True)
     return Response(serializer.data)
 
