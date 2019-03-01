@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Dropzone from "react-dropzone";
 import Moment from "react-moment";
+import { ClipLoader } from "react-spinners";
 
 class Datasets extends Component {
   constructor(props, context) {
@@ -22,7 +23,8 @@ class Datasets extends Component {
       show: false,
       data: [],
       files: [],
-      datasetName: ""
+      datasetName: "",
+      loading: false
     };
   }
 
@@ -47,6 +49,9 @@ class Datasets extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    this.setState({
+      loading: true
+    });
     var formData = new FormData();
     formData.append("name", this.state.datasetName);
     if (this.state.files.length > 0) {
@@ -68,7 +73,8 @@ class Datasets extends Component {
           data: clonedArray,
           files: [],
           datasetName: "",
-          show: false
+          show: false,
+          loading: false
         });
       });
   }
@@ -115,7 +121,7 @@ class Datasets extends Component {
                 <FontAwesomeIcon icon="arrow-circle-right" />
               </Button>
               <Button variant="link" href={"/hypothesis/" + entry.id}>
-                <FontAwesomeIcon icon="arrow-circle-right" />
+                <FontAwesomeIcon icon="fire" />
               </Button>
               <Button
                 variant="link"
@@ -189,6 +195,12 @@ class Datasets extends Component {
               </Button>
               <Button variant="primary" type="submit">
                 Submit
+                <ClipLoader
+                  sizeUnit={"px"}
+                  size={10}
+                  color={"#123abc"}
+                  loading={this.state.loading}
+                />
               </Button>
             </div>
           </div>
