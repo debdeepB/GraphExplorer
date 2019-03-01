@@ -3,9 +3,16 @@ import { DataSet, Network } from "vis/index-network";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-import Dropdown from "react-bootstrap/Dropdown";
+import { ClipLoader } from "react-spinners";
+import { css } from "@emotion/core";
 
 import "vis/dist/vis-network.min.css";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
 
 class Hypothesis extends Component {
   constructor(props) {
@@ -19,6 +26,7 @@ class Hypothesis extends Component {
     this.handleAddHypothesis = this.handleAddHypothesis.bind(this);
 
     this.state = {
+      loading: false,
       datasetId: params.datasetId,
       nodes: [],
       edges: [],
@@ -1150,6 +1158,13 @@ class Hypothesis extends Component {
             />
             <Button variant="primary" type="submit" className="input-group-btn">
               Submit
+              <ClipLoader
+                css={override}
+                sizeUnit={"px"}
+                size={10}
+                color={"#123abc"}
+                loading={this.state.loading}
+              />
             </Button>
           </form>
         </div>
