@@ -76,6 +76,7 @@ class Hypothesis extends Component {
     var that = this;
     this.state.network.on("click", function(properties) {
       var ids = properties.nodes;
+      console.log(ids && ids[0]);
       ids && that.fetchNeighbors(ids[0]);
     });
   }
