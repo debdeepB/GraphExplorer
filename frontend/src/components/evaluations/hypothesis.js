@@ -4,15 +4,8 @@ import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
-import { css } from "@emotion/core";
 
 import "vis/dist/vis-network.min.css";
-
-const override = css`
-  display: block;
-  margin: 0 auto;
-  border-color: red;
-`;
 
 class Hypothesis extends Component {
   constructor(props) {
@@ -999,8 +992,12 @@ class Hypothesis extends Component {
   async handleSubmit(event) {
     event.preventDefault();
     try {
+      var dataId = this.state.dataset.data[0].id;
+      console.log(dataId);
       const { data } = await axios.get(
-        `http://127.0.0.1:8000/api/search/179/?search=${this.state.search}`
+        `http://127.0.0.1:8000/api/search/${dataId}/?search=${
+          this.state.search
+        }`
       );
       var newNodes = this.state.nodes.slice();
       var incomingNodes = [];
@@ -1159,7 +1156,6 @@ class Hypothesis extends Component {
             <Button variant="primary" type="submit" className="input-group-btn">
               Submit
               <ClipLoader
-                css={override}
                 sizeUnit={"px"}
                 size={10}
                 color={"#123abc"}

@@ -108,4 +108,3 @@ class SearchNeighborView(APIView):
       "edges": edge_serializer.data
     }
     return Response(data)
-

@@ -1,11 +1,21 @@
 from rest_framework import serializers
-from .models import Dataset, Node, Edge
+from .models import Dataset, Node, Edge, Data
 from rest_framework.serializers import SerializerMethodField
 
+class DataSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Data
+    fields = ('id', 'file', 'created_at', 'dataset_id')
+
 class DatasetSerializer(serializers.ModelSerializer):
+  data = SerializerMethodField()
   class Meta:
     model = Dataset
-    fields = ('id','name', 'created_at')
+    fields = ('id','name', 'created_at', 'data')
+  
+  def get_data(self, obj):
+    queryset = obj.data_set.all()
+    return DataSerializer(queryset, many=True).data
 
 class NodeSerializer(serializers.ModelSerializer):
   title = serializers.CharField(source='nid')
