@@ -91,3 +91,18 @@ class NeighborView(APIView):
     }
     return Response(data)
 
+class SearchNeighborView(APIView):
+  def get(self, request):
+    node_id = request.GET.get('nid', '')
+    node = Node.objects.get(nid=node_id)
+    edges = Edge.objects.filter(from_node_id=node.id)
+    neighbor_ids = edges.all().values_list('to_node_id', flat=True)
+    neighbors = Node.objects.filter(pk__in=neighbor_ids)
+    node_serialier = NodeSerializer(neighbors, many=True)
+    edge_serializer = EdgeSerializer(edges, many=True)
+    data = {
+      "nodes": node_serialier.data,
+      "edges": edge_serializer.data
+    }
+    return Response(data)
+

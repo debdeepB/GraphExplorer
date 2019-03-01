@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
-from datastore.views import DatasetView, SearchNodeView, NeighborView
+from datastore.views import DatasetView, SearchNodeView, NeighborView, SearchNeighborView
 from eda.views import EdaView
 
 router = routers.DefaultRouter()
@@ -28,4 +28,5 @@ urlpatterns = [
     url('api/eda/(?P<dataset_id>[0-9]+)/$', EdaView.as_view()),
     url('api/search/(?P<data_id>[0-9]+)/', SearchNodeView.as_view()),
     url('api/getneighbors/(?P<node_id>[0-9]+)/', NeighborView.as_view()),
+    url('api/searchneighbors/', SearchNeighborView.as_view())
 ]
