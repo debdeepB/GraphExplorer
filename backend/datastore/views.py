@@ -6,6 +6,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
+from backend.settings import BASE_DIR
 import json
 
 
@@ -32,31 +33,35 @@ class DatasetView(viewsets.ViewSet):
     dataset.save()
     # save files
     for f in request.FILES.getlist('file'):
-      ds = dataset.data_set.create(file=f)
-      eda = EdaUtils(dataset.id)
-      eda.import_data()
-      json_data, node_id_map= eda.convert_to_networkx_json()
-      for edge in json_data["links"]:
-        source_id = edge["source"]
-        target_id = edge["target"]
-        edge_relation = edge["edge_relation"]
+      if str(f).endswith(".csv"):
+        ds = dataset.data_set.create(file=f, kind="kb")
+        eda = EdaUtils(dataset.id)
+        eda.import_data()
+        json_data, node_id_map= eda.convert_to_networkx_json()
+        for edge in json_data["links"]:
+          source_id = edge["source"]
+          target_id = edge["target"]
+          edge_relation = edge["edge_relation"]
 
-        source_node = node_id_map[source_id]
-        target_node = node_id_map[target_id]
+          source_node = node_id_map[source_id]
+          target_node = node_id_map[target_id]
 
-        source, created = Node.objects.get_or_create(data_id=ds.id, nid=source_node["node_id"], defaults={
-          'label': source_node["node_text"],
-          'type': source_node["node_type"]
-        })
-        target, created = Node.objects.get_or_create(data_id=ds.id, nid=target_node["node_id"], defaults={
-          'label': source_node["node_text"],
-          'type': source_node["node_type"]
-        })
-        Edge.objects.create(from_node=source, to_node=target, title=edge_relation)
-      
-      ds.graph = json.dumps(json_data)
-      ds.save()
-    
+          source, created = Node.objects.get_or_create(data_id=ds.id, nid=source_node["node_id"], defaults={
+            'label': source_node["node_text"],
+            'type': source_node["node_type"]
+          })
+          target, created = Node.objects.get_or_create(data_id=ds.id, nid=target_node["node_id"], defaults={
+            'label': target_node["node_text"],
+            'type': target_node["node_type"]
+          })
+          Edge.objects.create(from_node=source, to_node=target, title=edge_relation)
+        
+        ds.graph = json.dumps(json_data)
+        ds.save()
+      elif str(f).endswith(".json"):
+        ds = dataset.data_set.create(file=f, kind="hyp")
+        ds.save()
+
     serializer = DatasetSerializer(dataset)
     return Response(serializer.data)
 
@@ -108,3 +113,12 @@ class SearchNeighborView(APIView):
       "edges": edge_serializer.data
     }
     return Response(data)
+
+class Hypotheses(APIView):
+  def get(self, request, dataset_id):
+    ds = Dataset.objects.get(pk=dataset_id)
+    hypotheses = ds.data_set.get(kind="hyp")
+    file_url = BASE_DIR + hypotheses.file.url
+    with open(file_url) as json_file:
+      json_data = json.load(json_file)
+    return Response(json_data)

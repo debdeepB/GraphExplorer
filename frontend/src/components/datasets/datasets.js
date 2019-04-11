@@ -210,7 +210,7 @@ class Datasets extends Component {
     return (
       <div>
         <Button variant="primary" onClick={this.handleShow}>
-          Add Dataset
+          Add Knowledge Base
         </Button>
         {form}
         {table}
