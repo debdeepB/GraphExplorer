@@ -254,7 +254,7 @@ class Hypothesis extends Component {
           key={index}
           onClick={() => this.handleAddHypothesis(index)}
         >
-          Hypothesis - {index}
+          {hyp.graph.name}
         </button>
       );
     });
