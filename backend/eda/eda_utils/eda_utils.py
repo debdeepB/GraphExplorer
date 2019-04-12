@@ -64,10 +64,45 @@ class EdaUtils:
         
     json_data = json_graph.node_link_data(G)
     return json_data, node_id_map
-  
-def graph_similarity(mined_data, target_data):
-  return [[1, 2, 2.6], [2, 3, 3.2]]
+
+from pylev import levenshtein
+node_threshold = 10.0
+edge_threshold = 1000.0
+
+def my_node_match(node1, node2):
+  if node1["is_mention_id"] != node2["is_mention_id"]:
+    return False
+  return levenshtein(node1["node_text"], node2["node_text"]) < node_threshold
+    
+def my_edge_match(edge1, edge2):
+  # check whether relation is same
+  if levenshtein(edge1['edge_relation'],edge2['edge_relation']) > edge_threshold:
+    return False
+  # check whether edge2 is contradictory or not
+  return edge2['annotation'] != "contradicts"
 
 
+def graph_similarity(mined_hyps, target_hyps):
   
+  mined_graphs = []
+  target_graphs = []
+  
+  for mined_hyp in mined_hyps:
+    mined_graphs.append(json_graph.node_link_graph(mined_hyp))
+
+  for target_hyp in target_hyps:
+    target_graphs.append(json_graph.node_link_graph(target_hyp))
+
+  result = []
+  for i in range(len(mined_graphs)):
+    min_score = float('inf')
+    best = -1
+    for j in range(len(target_graphs)):
+        score = nx.graph_edit_distance(mined_graphs[i], target_graphs[j], node_match=my_node_match, edge_match=my_edge_match)
+        if (score < min_score):
+            min_score = score
+            best = j
+    result.append([i, best, min_score])
+        
+  return result
 

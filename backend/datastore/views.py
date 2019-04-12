@@ -137,6 +137,3 @@ class Scorer(APIView):
     with open(BASE_DIR + target_hyp.file.url) as json_file:
       target_data = json.load(json_file)
     return Response(graph_similarity(mined_data, target_data))
-
-
-
