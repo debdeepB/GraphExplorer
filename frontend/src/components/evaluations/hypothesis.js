@@ -75,6 +75,26 @@ class Hypothesis extends Component {
         x => x.id === edge["target"]
       ).node_cluster_id;
       newEdge["title"] = edge["edge_relation"];
+      if (edge["annotation"] && edge["annotation"] === "contradicts") {
+        newEdge["color"] = {};
+        newEdge["color"]["color"] = "red";
+        newEdge["dashes"] = true;
+        newEdge["width"] = 5;
+      } else if (
+        edge["annotation"] &&
+        edge["annotation"] === "partially-relevant"
+      ) {
+        newEdge["color"] = {};
+        newEdge["color"]["color"] = "blue";
+        newEdge["width"] = 5;
+      } else if (
+        edge["annotation"] &&
+        edge["annotation"] === "fully-relevant"
+      ) {
+        newEdge["color"] = {};
+        newEdge["color"]["color"] = "green";
+        newEdge["width"] = 5;
+      }
       newEdges.push(newEdge);
       incomingEdges.push(newEdge);
     }

@@ -29,7 +29,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/datasets" component={Datasets} />
             <Route exact path="/datasets/:datasetId" component={Dataset} />
-            <Route exact path="/evaluate/:datasetId" component={Evaluation} />
+            <Route exact path="/evaluate/" component={Evaluation} />
             <Route exact path="/hypothesis/:datasetId" component={Hypothesis} />
           </Switch>
         </div>

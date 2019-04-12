@@ -65,7 +65,8 @@ class EdaUtils:
     json_data = json_graph.node_link_data(G)
     return json_data, node_id_map
   
-    
+def graph_similarity(mined_data, target_data):
+  return [[1, 2, 2.6], [2, 3, 3.2]]
 
 
   

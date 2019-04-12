@@ -12,7 +12,7 @@ import json
 
 from .serializers import DatasetSerializer, NodeSerializer, EdgeSerializer
 from .models import Dataset, Data, Node, Edge
-from eda.eda_utils.eda_utils import EdaUtils
+from eda.eda_utils.eda_utils import EdaUtils, graph_similarity
 
 # Create your views here.
 class DatasetView(viewsets.ViewSet):
@@ -122,3 +122,21 @@ class Hypotheses(APIView):
     with open(file_url) as json_file:
       json_data = json.load(json_file)
     return Response(json_data)
+
+
+class Scorer(APIView):
+  def get(self, request):
+    mined_ds_id = request.GET.get('mined', '')
+    target_ds_id = request.GET.get('target', '')
+    mined_ds = Dataset.objects.get(pk=mined_ds_id)
+    target_ds = Dataset.objects.get(pk=target_ds_id)
+    mined_hyp = mined_ds.data_set.get(kind="hyp")
+    target_hyp = target_ds.data_set.get(kind="hyp")
+    with open(BASE_DIR + mined_hyp.file.url) as json_file:
+      mined_data = json.load(json_file)
+    with open(BASE_DIR + target_hyp.file.url) as json_file:
+      target_data = json.load(json_file)
+    return Response(graph_similarity(mined_data, target_data))
+
+
+
