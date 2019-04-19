@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
 import axios from "axios";
+import { Network } from "vis/index-network";
 
 class Evaluation extends Component {
   constructor(props) {
@@ -13,15 +14,19 @@ class Evaluation extends Component {
       minedDataset: null,
       targetDataset: null,
       minedHypotheses: [],
-      targetHypotheses: []
+      targetHypotheses: [],
+      networks: [],
+      hypMap: []
     };
     this.addMinedHypotheses = this.addMinedHypotheses.bind(this);
     this.addTargetHypotheses = this.addTargetHypotheses.bind(this);
     this.runGraphEditDistance = this.runGraphEditDistance.bind(this);
+    this.populateNetworks = this.populateNetworks.bind(this);
   }
 
   async componentDidMount() {
     await this.fetchDatasets(this.state.datasetId);
+    await this.populateNetworks();
   }
 
   async fetchDatasets(datasetId) {
@@ -36,8 +41,93 @@ class Evaluation extends Component {
     }
   }
 
+  async populateNetworks() {
+    var networks = [];
+    for (var i = 0; i < 20; i++) {
+      networks.push({
+        mined: new Network(
+          this.refs["graphRef-" + i + "-mined"],
+          { nodes: [], edges: [] },
+          {}
+        ),
+        target: new Network(
+          this.refs["graphRef-" + i + "-target"],
+          { nodes: [], edges: [] },
+          {}
+        )
+      });
+    }
+    this.setState({
+      networks: networks
+    });
+  }
+
+  convertData(hypList) {
+    var data = [];
+    for (let i = 0; i < hypList.length; i++) {
+      var hypo = hypList[i];
+      // convert nodes
+      var newNodes = [];
+      for (let n = 0; n < hypo.nodes.length; n++) {
+        var node = hypo.nodes[n];
+        var newNode = {};
+        if (newNodes.findIndex(x => x.id === node["node_cluster_id"]) !== -1)
+          continue;
+        newNode["id"] = node["node_cluster_id"];
+        newNode["label"] = node["node_text"];
+        newNode["title"] = node["node_cluster_id"];
+        newNode["color"] =
+          node["is_mention_id"] === true
+            ? { background: "#ffb3ff", border: "#d62ad6" }
+            : { background: "#bcffff", border: "#2fcfce" };
+        newNode["shape"] = node["is_mention_id"] === true ? "triangle" : "dot";
+        newNodes.push(newNode);
+      }
+      // convert edges
+      var newEdges = [];
+      for (let e = 0; e < hypo.links.length; e++) {
+        var edge = hypo.links[e];
+        var newEdge = {};
+        newEdge["from"] = hypo.nodes.find(
+          x => x.id === edge["source"]
+        ).node_cluster_id;
+        newEdge["to"] = hypo.nodes.find(
+          x => x.id === edge["target"]
+        ).node_cluster_id;
+        newEdge["title"] = edge["edge_relation"];
+        if (edge["annotation"] && edge["annotation"] === "contradicts") {
+          newEdge["color"] = {};
+          newEdge["color"]["color"] = "red";
+          newEdge["dashes"] = true;
+          newEdge["width"] = 5;
+        } else if (
+          edge["annotation"] &&
+          edge["annotation"] === "partially-relevant"
+        ) {
+          newEdge["color"] = {};
+          newEdge["color"]["color"] = "blue";
+          newEdge["width"] = 5;
+        } else if (
+          edge["annotation"] &&
+          edge["annotation"] === "fully-relevant"
+        ) {
+          newEdge["color"] = {};
+          newEdge["color"]["color"] = "green";
+          newEdge["width"] = 5;
+        }
+        newEdges.push(newEdge);
+      }
+      data.push({
+        nodes: newNodes,
+        edges: newEdges,
+        name: hypo.graph.name
+      });
+    }
+    return data;
+  }
+
   async addMinedHypotheses(datasetId) {
-    const minedDataset = this.state.datasets.find(ds => ds.id == datasetId);
+    const minedDataset = this.state.datasets.find(ds => ds.id === datasetId);
     this.setState({
       minedDataset: minedDataset
     });
@@ -47,7 +137,7 @@ class Evaluation extends Component {
       );
       console.log(data);
       this.setState({
-        minedHypotheses: data
+        minedHypotheses: this.convertData(data)
       });
     } catch (error) {
       console.log(error);
@@ -55,7 +145,7 @@ class Evaluation extends Component {
   }
 
   async addTargetHypotheses(datasetId) {
-    const targetDataset = this.state.datasets.find(ds => ds.id == datasetId);
+    const targetDataset = this.state.datasets.find(ds => ds.id === datasetId);
     this.setState({
       targetDataset: targetDataset
     });
@@ -65,7 +155,7 @@ class Evaluation extends Component {
       );
       console.log(data);
       this.setState({
-        targetHypotheses: data
+        targetHypotheses: this.convertData(data)
       });
     } catch (error) {
       console.log(error);
@@ -79,6 +169,25 @@ class Evaluation extends Component {
           this.state.minedDataset.id
         }&target=${this.state.targetDataset.id}`
       );
+      for (var i = 0; i < data.length; i++) {
+        var entry = data[i];
+        var mined_index = parseInt(entry[0]);
+        var target_index = parseInt(entry[1]);
+        var mined_network = this.state.networks[mined_index].mined;
+        var target_network = this.state.networks[mined_index].target;
+        var mined_nodes = this.state.minedHypotheses[mined_index].nodes;
+        var mined_edges = this.state.minedHypotheses[mined_index].edges;
+        var target_nodes = this.state.targetHypotheses[target_index].nodes;
+        var target_edges = this.state.targetHypotheses[target_index].edges;
+
+        mined_network.body.data.nodes.add(mined_nodes);
+        mined_network.body.data.edges.add(mined_edges);
+        target_network.body.data.nodes.add(target_nodes);
+        target_network.body.data.edges.add(target_edges);
+      }
+      this.setState({
+        hypMap: data
+      });
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -115,6 +224,22 @@ class Evaluation extends Component {
       this.state.targetDataset == null
         ? "Target Hypotheses"
         : this.state.targetDataset.name;
+
+    const createTable = [...Array(21).keys()].slice(1).map((elem, index) => {
+      return (
+        <div className="row mt-2" key={index}>
+          <div className="col-sm-5" ref={"graphRef-" + index + "-mined"} />
+          <div className="col-sm-5" ref={"graphRef-" + index + "-target"} />
+          <div
+            className="col-sm-2 text-center"
+            ref={"graphRef-" + index + "-score"}
+          >
+            {this.state.hypMap[index] && this.state.hypMap[index][2]}
+          </div>
+        </div>
+      );
+    });
+
     return (
       <div>
         <div className="card">
@@ -147,6 +272,7 @@ class Evaluation extends Component {
           <div className="card-header">Match Hypotheses</div>
           <div className="card-body" />
         </div> */}
+        <div className="card">{createTable}</div>
       </div>
     );
   }
