@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
+import { ClipLoader } from "react-spinners";
 
 import axios from "axios";
 import { Network } from "vis/index-network";
@@ -16,7 +17,8 @@ class Evaluation extends Component {
       minedHypotheses: [],
       targetHypotheses: [],
       networks: [],
-      hypMap: []
+      hypMap: [],
+      loading: false
     };
     this.addMinedHypotheses = this.addMinedHypotheses.bind(this);
     this.addTargetHypotheses = this.addTargetHypotheses.bind(this);
@@ -163,6 +165,9 @@ class Evaluation extends Component {
   }
 
   async runGraphEditDistance() {
+    this.setState({
+      loading: true
+    });
     try {
       const { data } = await axios.get(
         `http://127.0.0.1:8000/api/scorer/?mined=${
@@ -186,7 +191,8 @@ class Evaluation extends Component {
         target_network.body.data.edges.add(target_edges);
       }
       this.setState({
-        hypMap: data
+        hypMap: data,
+        loading: false
       });
       console.log(data);
     } catch (error) {
@@ -227,18 +233,44 @@ class Evaluation extends Component {
 
     const createTable = [...Array(21).keys()].slice(1).map((elem, index) => {
       return (
-        <div className="row mt-2" key={index}>
-          <div className="col-sm-5" ref={"graphRef-" + index + "-mined"} />
-          <div className="col-sm-5" ref={"graphRef-" + index + "-target"} />
-          <div
-            className="col-sm-2 text-center"
-            ref={"graphRef-" + index + "-score"}
-          >
-            {this.state.hypMap[index] && this.state.hypMap[index][2]}
+        <div key={index}>
+          <div className="row mt-2">
+            <div className="col-sm-5" ref={"graphRef-" + index + "-mined"} />
+            <div className="col-sm-5" ref={"graphRef-" + index + "-target"} />
           </div>
+          <div className="row mt-2">
+            <div className="col-sm-5 text-center">
+              {this.state.hypMap[index] &&
+                this.state.minedHypotheses[this.state.hypMap[index][0]].name}
+            </div>
+            <div className="col-sm-5 text-center">
+              {this.state.hypMap[index] &&
+                this.state.targetHypotheses[this.state.hypMap[index][1]].name}
+            </div>
+            <div
+              className="col-sm-2 text-center"
+              ref={"graphRef-" + index + "-score"}
+            >
+              {this.state.hypMap[index] && this.state.hypMap[index][2]}
+            </div>
+          </div>
+          <hr />
         </div>
       );
     });
+
+    const loadingButton = !this.state.loading ? (
+      <Button variant="link" onClick={() => this.runGraphEditDistance()}>
+        <FontAwesomeIcon icon="fire" size="lg" />
+      </Button>
+    ) : (
+      <ClipLoader
+        sizeUnit={"px"}
+        size={20}
+        color={"#123abc"}
+        loading={this.state.loading}
+      />
+    );
 
     return (
       <div>
@@ -258,12 +290,7 @@ class Evaluation extends Component {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>{targetDatasetItems}</Dropdown.Menu>
               </Dropdown>
-              <Button
-                variant="link"
-                onClick={() => this.runGraphEditDistance()}
-              >
-                <FontAwesomeIcon icon="fire" size="lg" />
-              </Button>
+              {loadingButton}
             </div>
             <div />
           </div>
@@ -272,7 +299,14 @@ class Evaluation extends Component {
           <div className="card-header">Match Hypotheses</div>
           <div className="card-body" />
         </div> */}
-        <div className="card">{createTable}</div>
+        <div className="card">
+          <div className="row mt-2">
+            <div className="col-sm-5 text-center">Mined Hypotheses</div>
+            <div className="col-sm-5 text-center">Target Hypotheses</div>
+            <div className="col-sm-2 text-center">Score</div>
+          </div>
+          {createTable}
+        </div>
       </div>
     );
   }
