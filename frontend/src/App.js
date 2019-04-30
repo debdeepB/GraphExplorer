@@ -5,17 +5,20 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowCircleRight,
   faTrash,
-  faFire
+  faFire,
+  faFileDownload
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faArrowCircleRight);
 library.add(faTrash);
 library.add(faFire);
+library.add(faFileDownload);
 
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import Datasets from "./components/datasets/datasets";
 import Dataset from "./components/datasets/dataset";
 import Evaluation from "./components/evaluations/evaluation";
+import TabHypothesis from "./components/evaluations/tabhypothesis";
 import NavBar from "./components/navbar";
 import "./App.css";
 import Hypothesis from "./components/evaluations/hypothesis";
@@ -29,7 +32,8 @@ class App extends Component {
           <Switch>
             <Route exact path="/datasets" component={Datasets} />
             <Route exact path="/datasets/:datasetId" component={Dataset} />
-            <Route exact path="/evaluate/:datasetId" component={Evaluation} />
+            <Route exact path="/evaluate/" component={Evaluation} />
+            <Route exact path="/tabview/" component={TabHypothesis} />
             <Route exact path="/hypothesis/:datasetId" component={Hypothesis} />
           </Switch>
         </div>

@@ -13,6 +13,7 @@ class Data(models.Model):
   created_at = models.DateTimeField(auto_now=True)
   dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
   graph = JSONField(null=True, blank=True)
+  kind= models.CharField(max_length=200, null=True, blank=True)
 
 class Node(models.Model):
   nid = models.CharField(max_length=200)
