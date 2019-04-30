@@ -137,7 +137,7 @@ class Datasets extends Component {
     let table;
     if (result.length > 0) {
       table = (
-        <Table striped bordered hover>
+        <Table striped bordered hover className="mt-3">
           <thead>
             <tr>
               <th>#</th>

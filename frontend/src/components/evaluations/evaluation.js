@@ -27,11 +27,11 @@ class Evaluation extends Component {
   }
 
   async componentDidMount() {
-    await this.fetchDatasets(this.state.datasetId);
+    await this.fetchDatasets();
     await this.populateNetworks();
   }
 
-  async fetchDatasets(datasetId) {
+  async fetchDatasets() {
     try {
       axios.get("http://127.0.0.1:8000/api/datasets/").then(res => {
         this.setState({

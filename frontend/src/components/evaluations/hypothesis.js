@@ -112,8 +112,9 @@ class Hypothesis extends Component {
   async handleSubmit(event) {
     event.preventDefault();
     try {
-      var dataId = this.state.dataset.data[0].id;
-      console.log(dataId);
+      var dataId = this.state.dataset.data.find(
+        x => x.file.split(".")[x.file.split(".").length - 1] === "csv"
+      ).id;
       const { data } = await axios.get(
         `http://127.0.0.1:8000/api/search/${dataId}/?search=${
           this.state.search
