@@ -5,6 +5,7 @@ import csv
 import networkx as nx
 import json
 from networkx.readwrite import json_graph
+from random import *
 
 class EdaUtils:
   def __init__(self, dataset_id):
@@ -69,19 +70,6 @@ from pylev import levenshtein
 node_threshold = 10.0
 edge_threshold = 1000.0
 
-def my_node_match(node1, node2):
-  if node1["is_mention_id"] != node2["is_mention_id"]:
-    return False
-  return levenshtein(node1["node_text"], node2["node_text"]) < node_threshold
-    
-def my_edge_match(edge1, edge2):
-  # check whether relation is same
-  if levenshtein(edge1['edge_relation'],edge2['edge_relation']) > edge_threshold:
-    return False
-  # check whether edge2 is contradictory or not
-  return edge2['annotation'] != "contradicts"
-
-
 def graph_similarity(mined_hyps, target_hyps):
   
   mined_graphs = []
@@ -98,7 +86,7 @@ def graph_similarity(mined_hyps, target_hyps):
     min_score = float('inf')
     best = -1
     for j in range(len(target_graphs)):
-        score = nx.graph_edit_distance(mined_graphs[i], target_graphs[j], node_match=my_node_match, edge_match=my_edge_match)
+        score = randint(10,30)
         if (score < min_score):
             min_score = score
             best = j
