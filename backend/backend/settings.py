@@ -84,9 +84,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'hypoviz',
-        'USER': 'dsradmin',
-        'PASSWORD': 'R4$t5%y6^',
-        'HOST': 'localhost',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': '',
     }
 }
@@ -110,9 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ORIGIN_WHITELIST = (
-  'http://localhost:3000'
-)
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Internationalization
