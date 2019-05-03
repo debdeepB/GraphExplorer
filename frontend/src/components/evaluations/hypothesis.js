@@ -40,6 +40,8 @@ class Hypothesis extends Component {
 
   async handleAddHypothesis(index) {
     var hypo = this.state.hypothesis[index];
+    console.log("hypo:");
+    console.log(hypo);
     // add nodes and add edges
     var newNodes = this.state.nodes.slice();
     var incomingNodes = [];
@@ -49,9 +51,9 @@ class Hypothesis extends Component {
       if (
         this.state.nodes.findIndex(x => x.title === node.node_cluster_id) === -1
       ) {
-        newNode["id"] = node["node_cluster_id"];
+        newNode["id"] = node["node_id"];
         newNode["label"] = node["node_text"];
-        newNode["title"] = node["node_cluster_id"];
+        newNode["title"] = node["node_id"];
         newNode["color"] =
           node["is_mention_id"] === true
             ? { background: "#ffb3ff", border: "#d62ad6" }
@@ -68,12 +70,8 @@ class Hypothesis extends Component {
     for (let i = 0; i < hypo.links.length; i++) {
       var edge = hypo.links[i];
       var newEdge = {};
-      newEdge["from"] = hypo.nodes.find(
-        x => x.id === edge["source"]
-      ).node_cluster_id;
-      newEdge["to"] = hypo.nodes.find(
-        x => x.id === edge["target"]
-      ).node_cluster_id;
+      newEdge["from"] = hypo.nodes.find(x => x.id === edge["source"]).node_id;
+      newEdge["to"] = hypo.nodes.find(x => x.id === edge["target"]).node_id;
       newEdge["title"] = edge["edge_relation"];
       if (edge["annotation"] && edge["annotation"] === "contradicts") {
         newEdge["color"] = {};

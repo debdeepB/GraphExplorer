@@ -33,7 +33,6 @@ class TabHypothesis extends Component {
       csvContent += row.join(",");
       csvContent += "\n";
     });
-    console.log(csvContent);
     var link = window.document.createElement("a");
     link.setAttribute(
       "href",
@@ -79,7 +78,6 @@ class TabHypothesis extends Component {
         header.push("Arg-" + j);
       }
     }
-    console.log(header);
     // now construct the csv file
     var res = [];
     for (let i = 0; i < this.state.hypotheses.length; i++) {
@@ -87,12 +85,18 @@ class TabHypothesis extends Component {
       let row = Array(maxEvents + maxDegree * maxEvents + 1).fill("");
       row[0] = hyp.graph.name;
       let eventCount = 0;
+      console.log(hyp.graph.name);
+      console.log(hyp);
+
       for (let j = 0; j < hyp.nodes.length; j++) {
         let node = hyp.nodes[j];
         if (node.is_mention_id) {
           let index = eventCount * maxDegree + eventCount + 1;
           row[index++] = node.node_text.replace(/#/g, "").replace(/,/g, "");
+          console.log("node_id:" + node.id);
           var edges = hyp.links.filter(link => link.source === node.id);
+          console.log("links:" + hyp.links);
+          console.log("edges:" + edges);
           for (let k = 0; k < edges.length; k++) {
             let argRole =
               edges[k].edge_relation +
@@ -109,7 +113,6 @@ class TabHypothesis extends Component {
       header: header,
       hypothesesData: res
     });
-    console.log(res);
   }
 
   async selectChosenDataset(datasetId) {
@@ -124,7 +127,6 @@ class TabHypothesis extends Component {
       this.setState({
         hypotheses: data
       });
-      console.log(data);
       this.buildTable();
     } catch (error) {}
   }

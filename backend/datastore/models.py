@@ -5,7 +5,7 @@ from django.db import models
 
 # Create your models here.
 class Dataset(models.Model):
-  name = models.CharField(max_length=200)
+  name = models.TextField()
   created_at = models.DateTimeField(auto_now=True)
 
 class Data(models.Model):
@@ -13,18 +13,18 @@ class Data(models.Model):
   created_at = models.DateTimeField(auto_now=True)
   dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
   graph = JSONField(null=True, blank=True)
-  kind= models.CharField(max_length=200, null=True, blank=True)
+  kind= models.TextField(null=True, blank=True)
 
 class Node(models.Model):
-  nid = models.CharField(max_length=200)
-  label = models.CharField(max_length=200)
-  type = models.CharField(max_length=200)
+  nid = models.TextField()
+  label = models.TextField()
+  type = models.TextField()
   data = models.ForeignKey(Data, on_delete=models.CASCADE)
 
 class Edge(models.Model):
   from_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='source')
   to_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='dest')
-  title = models.CharField(max_length=200)
+  title = models.TextField()
 
 
 

@@ -84,9 +84,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'hypoviz',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'USER': 'dsradmin',
+        'PASSWORD': 'R4$t5%y6^',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
