@@ -48,9 +48,7 @@ class Hypothesis extends Component {
     for (let i = 0; i < hypo.nodes.length; i++) {
       var newNode = {};
       var node = hypo.nodes[i];
-      if (
-        this.state.nodes.findIndex(x => x.title === node.node_cluster_id) === -1
-      ) {
+      if (this.state.nodes.findIndex(x => x.title === node.node_id) === -1) {
         newNode["id"] = node["node_id"];
         newNode["label"] = node["node_text"];
         newNode["title"] = node["node_id"];

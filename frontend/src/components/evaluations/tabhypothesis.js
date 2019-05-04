@@ -94,14 +94,23 @@ class TabHypothesis extends Component {
           let index = eventCount * maxDegree + eventCount + 1;
           row[index++] = node.node_text.replace(/#/g, "").replace(/,/g, "");
           console.log("node_id:" + node.id);
-          var edges = hyp.links.filter(link => link.source === node.id);
+          var edges = hyp.links.filter(
+            link => link.source === node.id || link.target == node.id
+          );
           console.log("links:" + hyp.links);
           console.log("edges:" + edges);
           for (let k = 0; k < edges.length; k++) {
+            var secondNode;
+            if (!hyp.nodes[edges[k].source].is_mention_id) {
+              secondNode = hyp.nodes[edges[k].source];
+            } else if (!hyp.nodes[edges[k].target].is_mention_id) {
+              secondNode = hyp.nodes[edges[k].target];
+            }
+            let edgeRelation = edges[k].edge_relation;
             let argRole =
-              edges[k].edge_relation +
+              edgeRelation.split("_")[edgeRelation.split("_").length - 1] +
               ": " +
-              hyp.nodes[edges[k].target].node_text;
+              secondNode.node_text;
             row[index++] = argRole.replace(/#/g, "").replace(/,/g, "");
           }
           eventCount++;

@@ -11,10 +11,6 @@ class NavBar extends Component {
           <Nav.Link href="/evaluate/">Evaluate</Nav.Link>
           <Nav.Link href="/tabview/">TabView</Nav.Link>
         </Nav>
-        <Form inline>
-          <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-          <Button variant="outline-primary">Search</Button>
-        </Form>
       </Navbar>
     );
   }

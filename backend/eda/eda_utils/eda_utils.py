@@ -39,8 +39,8 @@ class EdaUtils:
     node_id_map = {}
 
     for index, row in self.aida_edges.iterrows():
-      node_id_1 = row['event_relation_id']
-      node_id_2 = row['entity_id']
+      node_id_1 = row['event_relation_mention_id']
+      node_id_2 = row['entity_mention_id']
       if node_id_1 not in node_map:
           node_map[node_id_1] = len(node_map)
           node_id_map[node_map[node_id_1]] = {}
